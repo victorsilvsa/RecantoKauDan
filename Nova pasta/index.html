@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="pt-BR" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KauDan - Gestão do Recanto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="height: 100%; width: 100%;"><!-- LOGIN -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo"><i class="fas fa-leaf"></i>
+                </div>
+                <h1 class="login-title">KauDan</h1>
+                <p class="login-subtitle">Gestão do Recanto</p>
+            </div>
+            <div class="login-error" id="loginError"></div>
+            <form id="loginForm">
+                <div class="form-group"><label class="form-label" for="loginUser">Usuário</label> <input type="text"
+                        class="form-input" id="loginUser" required autofocus>
+                </div>
+                <div class="form-group"><label class="form-label" for="loginPassword">Senha</label> <input
+                        type="password" class="form-input" id="loginPassword" autocomplete="off" placeholder="••••••"
+                        required>
+                </div><button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+            </form>
+        </div>
+    </div><!-- APP CONTAINER -->
+    <div class="app" id="app" style="height: 100%;"><!-- TOP BAR -->
+        <div class="top-bar">
+            <div class="user-info">
+                <div class="user-avatar"><i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--cinza-500);">
+                        Bem-vindo
+                    </div>
+                    <div id="topBarUser" style="font-size: 1rem; font-weight: 700;">
+                        Danilo
+                    </div>
+                </div>
+            </div><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span
+                    style="display: none;">Sair</span></button>
+        </div><!-- MAIN WRAPPER -->
+        <div class="main-wrapper"><!-- SIDEBAR - Desktop Only -->
+            <aside class="sidebar">
+                <div class="sidebar-logo"><i class="fas fa-leaf"></i> <span>KauDan</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-page="calendar"><i class="fas fa-calendar-alt"></i> <span>Agenda</span>
+                    </div>
+                    <div class="nav-item" data-page="rentals"><i class="fas fa-key"></i> <span>Aluguéis</span>
+                    </div>
+                    <div class="nav-item" data-page="expenses"><i class="fas fa-receipt"></i> <span>Despesas</span>
+                    </div>
+                    <div class="nav-item" data-page="clients"><i class="fas fa-users"></i> <span>Clientes</span>
+                    </div>
+                    <div class="nav-item" data-page="reserves"><i class="fas fa-bookmark"></i> <span>Reservas</span>
+                    </div>
+                    <div class="nav-item" data-page="notes"><i class="fas fa-sticky-note"></i> <span>Anotações</span>
+                    </div>
+                    <div class="nav-item" data-page="reports"><i class="fas fa-file-alt"></i> <span>Relatórios</span>
+                    </div>
+                    <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i> <span>Configurações</span>
+                    </div>
+                </nav>
+                <div class="sidebar-footer"><button class="logout-btn" onclick="logout()"><i
+                            class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </aside><!-- MAIN CONTENT -->
+            <div class="main-content">
+                <header class="header">
+                    <div class="header-content">
+                        <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                        <p class="header-subtitle" id="pageSubtitle">Bem-vindo ao Recanto KauDan</p>
+                    </div>
+                    <div class="header-mobile-brand"><i class="fas fa-leaf"></i> <span>KauDan</span>
+                    </div>
+                </header>
+                <div class="content" id="content"></div>
+            </div>
+        </div><!-- BOTTOM BAR - Mobile Only -->
+        <div class="bottom-bar">
+            <div class="bottom-nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="bottom-nav-item" data-page="calendar"><i class="fas fa-calendar-alt"></i> <span>Agenda</span>
+            </div>
+            <div class="bottom-nav-item" data-page="rentals"><i class="fas fa-key"></i> <span>Aluguéis</span>
+            </div>
+            <div class="bottom-nav-item" data-page="expenses"><i class="fas fa-receipt"></i> <span>Despesas</span>
+            </div>
+            <div class="bottom-nav-item bottom-nav-more" onclick="toggleBottomMenu()"><i class="fas fa-ellipsis-h"></i>
+                <span>Mais</span>
+            </div>
+        </div><!-- BOTTOM MENU - More Options -->
+        <div class="bottom-menu" id="bottomMenu">
+            <div class="bottom-menu-header">
+                Mais Opções
+            </div>
+            <div class="bottom-menu-item" data-page="clients" onclick="navigatePage('clients'); toggleBottomMenu();"><i
+                    class="fas fa-users"></i> <span>Clientes</span>
+            </div>
+            <div class="bottom-menu-item" data-page="reserves" onclick="navigatePage('reserves'); toggleBottomMenu();">
+                <i class="fas fa-bookmark"></i> <span>Reservas</span>
+            </div>
+            <div class="bottom-menu-item" data-page="notes" onclick="navigatePage('notes'); toggleBottomMenu();"><i
+                    class="fas fa-sticky-note"></i> <span>Anotações</span>
+            </div>
+            <div class="bottom-menu-item" data-page="reports" onclick="navigatePage('reports'); toggleBottomMenu();"><i
+                    class="fas fa-file-alt"></i> <span>Relatórios</span>
+            </div>
+            <div class="bottom-menu-item" data-page="settings" onclick="navigatePage('settings'); toggleBottomMenu();">
+                <i class="fas fa-cog"></i> <span>Configurações</span>
+            </div>
+            <div style="border-top: 2px solid var(--verde-claro); margin: 0.5rem 0; padding: 0.5rem 0;"></div>
+            <div class="bottom-menu-item" onclick="logout();" style="color: #ef4444;"><i class="fas fa-sign-out-alt"
+                    style="color: #ef4444;"></i> <span>Sair</span>
+            </div>
+        </div>
+    </div><!-- MODAL BACKDROP -->
+    <div class="modal-backdrop" id="modalBackdrop"></div><!-- RENTAL MODAL -->
+    <div class="modal" id="rentalModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('rentalModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-plus"></i> Nova Locação
+            </div>
+            <form id="rentalForm">
+                <div class="form-group"><label class="form-label" for="clientName">Nome do Cliente</label> <input
+                        type="text" class="form-input" id="clientName" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="periodSelected">Período Selecionado</label>
+                    <input type="text" class="form-input" id="periodSelected" readonly
+                        style="background: var(--cinza-100);">
+                </div>
+                <div class="form-group"><label class="form-label" for="daysCount">Quantidade de Dias</label> <input
+                        type="number" class="form-input" id="daysCount" readonly style="background: var(--cinza-100);">
+                </div>
+                <div class="form-group"><label class="form-label" for="dailyRate">Valor da Diária (R$)</label> <input
+                        type="number" class="form-input" id="dailyRate" min="0" step="0.01" required
+                        onchange="calcRentalTotal()">
+                </div>
+                <div class="form-group"><label class="form-label" for="rentalTotal">Total (R$)</label> <input
+                        type="text" class="form-input" id="rentalTotal" readonly
+                        style="background: var(--cinza-100); font-weight: 700; color: var(--verde-principal); font-size: 1.25rem;">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Confirmar</button> <button
+                        type="button" class="btn btn-secondary" onclick="closeModal('rentalModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- QUICK ADD EXPENSE MODAL -->
+    <div class="modal" id="quickAddModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('quickAddModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-plus"></i> <span id="quickAddTitle">Lançar Despesa</span>
+            </div>
+            <form id="quickAddForm">
+                <div class="form-group"><label class="form-label" for="quickAmount">Valor (R$)</label> <input
+                        type="number" class="form-input" id="quickAmount" placeholder="0,00" min="0" step="0.01"
+                        required autofocus>
+                </div>
+                <div class="form-group"><label class="form-label" for="quickDate">Data</label> <input type="date"
+                        class="form-input" id="quickDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="quickNote">Observação (opcional)</label> <input
+                        type="text" class="form-input" id="quickNote" placeholder="Ex: Reparação...">
+                </div><button type="submit" class="btn btn-primary btn-block"><i class="fas fa-check"></i>
+                    Confirmar</button>
+            </form>
+        </div>
+    </div><!-- EDIT EXPENSE MODAL -->
+    <div class="modal" id="editExpenseModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('editExpenseModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-edit"></i> Editar Despesa
+            </div>
+            <form id="editExpenseForm">
+                <div class="form-group"><label class="form-label" for="editAmount">Valor (R$)</label> <input
+                        type="number" class="form-input" id="editAmount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editDate">Data</label> <input type="date"
+                        class="form-input" id="editDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editNote">Observação</label> <input type="text"
+                        class="form-input" id="editNote">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary"
+                        onclick="closeModal('editExpenseModal')">Cancelar</button> <button type="button"
+                        class="btn btn-danger" onclick="deleteCurrentExpense()">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- HISTORY MODAL -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content" style="max-width: 100%; max-height: 80vh;"><button class="modal-close"
+                onclick="closeModal('historyModal')"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-history"></i> <span id="historyTitle">Histórico</span>
+            </div>
+            <div id="historyList" style="overflow-y: auto;"></div>
+        </div>
+    </div><!-- CLIENT MODAL -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('clientModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-user-plus"></i> Novo Cliente
+            </div>
+            <form id="clientForm">
+                <div class="form-group"><label class="form-label" for="clientFullName">Nome Completo</label> <input
+                        type="text" class="form-input" id="clientFullName" required autofocus>
+                </div>
+                <div class="form-group"><label class="form-label" for="clientEmail">Email</label> <input type="email"
+                        class="form-input" id="clientEmail">
+                </div>
+                <div class="form-group"><label class="form-label" for="clientCPF">CPF</label> <input type="text"
+                        class="form-input" id="clientCPF" placeholder="000.000.000-00">
+                </div>
+                <div class="form-group"><label class="form-label" for="clientPhone">Telefone</label> <input type="tel"
+                        class="form-input" id="clientPhone">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary" onclick="closeModal('clientModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- EDIT CLIENT MODAL -->
+    <div class="modal" id="editClientModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('editClientModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-edit"></i> Editar Cliente
+            </div>
+            <form id="editClientForm">
+                <div class="form-group"><label class="form-label" for="editClientName">Nome Completo</label> <input
+                        type="text" class="form-input" id="editClientName" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editClientEmail">Email</label> <input
+                        type="email" class="form-input" id="editClientEmail">
+                </div>
+                <div class="form-group"><label class="form-label" for="editClientCPF">CPF</label> <input type="text"
+                        class="form-input" id="editClientCPF" placeholder="000.000.000-00">
+                </div>
+                <div class="form-group"><label class="form-label" for="editClientPhone">Telefone</label> <input
+                        type="tel" class="form-input" id="editClientPhone">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary"
+                        onclick="closeModal('editClientModal')">Cancelar</button> <button type="button"
+                        class="btn btn-danger" onclick="deleteCurrentClient()">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- RESERVE MODAL -->
+    <div class="modal" id="reserveModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('reserveModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-bookmark"></i> Nova Reserva
+            </div>
+            <form id="reserveForm">
+                <div class="form-group"><label class="form-label" for="reserveClient">Cliente</label> <select
+                        class="form-select" id="reserveClient" required>
+                        <option value="">Selecione um cliente...</option>
+                    </select>
+                </div>
+                <div class="form-group"><label class="form-label" for="reservePeriod">Período Selecionado</label> <input
+                        type="text" class="form-input" id="reservePeriod" readonly
+                        style="background: var(--cinza-100);">
+                </div>
+                <div class="form-group"><label class="form-label" for="reserveRate">Valor da Diária (R$)</label> <input
+                        type="number" class="form-input" id="reserveRate" min="0" step="0.01" required>
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('reserveModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- EDIT RENTAL MODAL -->
+    <div class="modal" id="editRentalModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('editRentalModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-edit"></i> Editar Locação
+            </div>
+            <form id="editRentalForm">
+                <div class="form-group"><label class="form-label" for="editRentalClientName">Nome do Cliente</label>
+                    <input type="text" class="form-input" id="editRentalClientName" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editRentalStartDate">Data Início</label> <input
+                        type="date" class="form-input" id="editRentalStartDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editRentalEndDate">Data Fim</label> <input
+                        type="date" class="form-input" id="editRentalEndDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editRentalDailyRate">Valor da Diária (R$)</label>
+                    <input type="number" class="form-input" id="editRentalDailyRate" min="0" step="0.01" required
+                        onchange="calcEditRentalTotal()">
+                </div>
+                <div class="form-group"><label class="form-label" for="editRentalTotal">Total (R$)</label> <input
+                        type="text" class="form-input" id="editRentalTotal" readonly
+                        style="background: var(--cinza-100); font-weight: 700; color: var(--verde-principal); font-size: 1.25rem;">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary"
+                        onclick="closeModal('editRentalModal')">Cancelar</button> <button type="button"
+                        class="btn btn-danger" onclick="deleteCurrentRental()">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- EDIT RESERVE MODAL -->
+    <div class="modal" id="editReserveModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('editReserveModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-edit"></i> Editar Reserva
+            </div>
+            <form id="editReserveForm">
+                <div class="form-group"><label class="form-label" for="editReserveClientName">Cliente</label> <input
+                        type="text" class="form-input" id="editReserveClientName" readonly
+                        style="background: var(--cinza-100);">
+                </div>
+                <div class="form-group"><label class="form-label" for="editReserveStartDate">Data Início</label> <input
+                        type="date" class="form-input" id="editReserveStartDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editReserveEndDate">Data Fim</label> <input
+                        type="date" class="form-input" id="editReserveEndDate" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="editReserveDailyRate">Valor da Diária
+                        (R$)</label> <input type="number" class="form-input" id="editReserveDailyRate" min="0"
+                        step="0.01" required onchange="calcEditReserveTotal()">
+                </div>
+                <div class="form-group"><label class="form-label" for="editReserveTotal">Estimado (R$)</label> <input
+                        type="text" class="form-input" id="editReserveTotal" readonly
+                        style="background: var(--cinza-100); font-weight: 700; color: var(--verde-principal); font-size: 1.25rem;">
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary"
+                        onclick="closeModal('editReserveModal')">Cancelar</button> <button type="button"
+                        class="btn btn-danger" onclick="deleteCurrentReserve()">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div><!-- ADD NOTE MODAL -->
+    <div class="modal" id="addNoteModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('addNoteModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-sticky-note"></i> Nova Anotação
+            </div>
+            <form id="addNoteForm">
+                <div class="form-group"><label class="form-label" for="noteTitle">Título</label> <input type="text"
+                        class="form-input" id="noteTitle" required autofocus>
+                </div>
+                <div class="form-group"><label class="form-label" for="noteContent">Conteúdo</label> <textarea
+                        class="form-input" id="noteContent" placeholder="Digite sua anotação aqui..."
+                        style="min-height: 120px; resize: vertical;" required></textarea>
+                </div>
+                <div class="modal-buttons"><button type="submit" class="btn btn-primary">Salvar</button> <button
+                        type="button" class="btn btn-secondary" onclick="closeModal('addNoteModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal" id="confirmModal">
+   <div class="modal-content" style="max-width: 400px;">
+    <h3 id="confirmTitle" style="margin-bottom: 1rem; color: var(--verde-principal);"></h3>
+    <p id="confirmMessage" style="margin-bottom: 1.5rem; color: var(--cinza-700); line-height: 1.5;"></p>
+    <div style="display: flex; gap: 1rem; justify-content: flex-end;"><button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancelar</button> <button type="button" class="btn btn-danger" id="confirmButton">Confirmar</button>
+    </div>
+   </div>
+  </div>
+<div id="modalBackdrop" class="modal-backdrop"></div>
+
+<div id="modal" class="modal">
+    <div class="modal-content" id="modalContent">
+        <!-- conteúdo injetado via JS -->
+    </div>
+</div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content"><button class="modal-close" onclick="closeModal('settingsModal')"><i
+                    class="fas fa-times"></i></button>
+            <div class="modal-header"><i class="fas fa-cog"></i> Configurações
+            </div>
+            <form id="settingsForm">
+                <div class="form-group"><label class="form-label" for="initialCapital">Capital Inicial (R$)</label>
+                    <input type="number" class="form-input" id="initialCapital" min="0" step="0.01" required>
+                </div>
+                <div class="form-group"><label class="form-label" for="defaultDailyRate">Diária Padrão (R$)</label>
+                    <input type="number" class="form-input" id="defaultDailyRate" min="0" step="0.01" required>
+                </div>
+                <div class="form-group"
+                    style="margin-top: 2rem; border-top: 2px solid var(--cinza-200); padding-top: 1.5rem;"><label
+                        class="form-label" style="color: #ef4444; font-weight: 700;">Zona de Perigo</label> <button
+                        type="button" class="btn btn-danger btn-block" onclick="resetAllData()"><i
+                            class="fas fa-trash"></i> Resetar Todos os Dados</button>
+                </div>
+                <div class="modal-buttons" style="margin-top: 2rem;"><button type="submit"
+                        class="btn btn-primary">Salvar</button> <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('settingsModal')">Fechar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+
+</html>
